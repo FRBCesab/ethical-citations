@@ -61,6 +61,11 @@ This repository is structured as follow:
   [`README`](https://github.com/frbcesab/ethical-citations/blob/main/data/README.md)
   for further information.
 
+- [`figures/`](https://github.com/frbcesab/ethical-citations/blob/main/figures):
+  contains the figures of the project. See the
+  [`README`](https://github.com/frbcesab/ethical-citations/blob/main/figures/README.md)
+  for a complete description of the files.
+
 - [`outputs/`](https://github.com/frbcesab/ethical-citations/blob/main/outputs):
   contains the outputs of the project. See the
   [`README`](https://github.com/frbcesab/ethical-citations/blob/main/outputs/README.md)
