@@ -14,7 +14,7 @@ knitr::opts_chunk$set(collapse  = TRUE,
 
 
 
-ethical-citations <img src="man/figures/compendium-sticker.png" align="right" style="float:right; height:120px;"/>
+ethical-citations <img src="https://raw.githubusercontent.com/FRBCesab/templates/main/logos/compendium-sticker.png" align="right" style="float:right; height:120px;"/>
 =========================================================
 
 <!-- badges: start -->
@@ -25,7 +25,7 @@ ethical-citations <img src="man/figures/compendium-sticker.png" align="right" st
 
 <p align="left">
   • <a href="#overview">Overview</a><br>
-  • <a href="#features">Features</a><br>
+  • <a href="#data-sources">Data sources</a><br>
   • <a href="#content">Content</a><br>
   • <a href="#installation">Installation</a><br>
   • <a href="#usage">Usage</a><br>
@@ -39,30 +39,44 @@ ethical-citations <img src="man/figures/compendium-sticker.png" align="right" st
 
 ## Overview
 
-This research compendium... **{{ DESCRIBE YOUR PROJECT }}**
+This project is dedicated to ...
 
 
 
-## Features
+## Data sources
 
-The main purpose of this compendium is to... **{{ DESCRIBE THE MAIN FEATURES }}**
+This project uses the following databases:
 
+
+| Database                  | Usage                                                 | Reference                     | Link                                                                |
+| :------------------------ | :---------------------------------------------------- | :---------------------------- | :-----------------------------------------------------------------: |
+| ... | ... | ... | [link](#) |
+
+A comprehensive description of all these databases is available [here](https://github.com/frbcesab/ethical-citations/blob/main/data/README.md).
+
+
+## Workflow
+
+The analysis pipeline follows these steps:
+
+1. ...
 
 
 ## Content
 
 This repository is structured as follow:
 
-- [`DESCRIPTION`](https://github.com/frbcesab/ethical-citations/tree/main/DESCRIPTION):
-contains project metadata (authors, date, dependencies, etc.)
+- [`DESCRIPTION`](https://github.com/frbcesab/ethical-citations/blob/main/DESCRIPTION): contains project metadata (authors, description, license, dependencies, etc.).
 
-- [`make.R`](https://github.com/frbcesab/ethical-citations/tree/main/make.R):
-main R script to run the entire project
+- [`make.R`](https://github.com/frbcesab/ethical-citations/blob/main/make.R): main R script to set up and run the entire project. Open this file to follow the workflow step by step.
 
-- [`R/`](https://github.com/frbcesab/ethical-citations/tree/main/R):
-contains R functions developed especially for this project
+- [`R/`](https://github.com/frbcesab/ethical-citations/blob/main/R): contains R functions developed especially for this project.
 
-- **{{ LIST ADDITIONAL FILES/FOLDER }}**
+- [`data/`](https://github.com/frbcesab/ethical-citations/blob/main/data): contains raw data used in this project. See the [`README`](https://github.com/frbcesab/ethical-citations/blob/main/data/README.md) for further information.
+
+- [`figures/`](https://github.com/frbcesab/ethical-citations/blob/main/figures): contains the figures of the project. See the [`README`](https://github.com/frbcesab/ethical-citations/blob/main/figures/README.md) for a complete description of the files.
+
+- [`outputs/`](https://github.com/frbcesab/ethical-citations/blob/main/outputs): contains the outputs of the project. See the [`README`](https://github.com/frbcesab/ethical-citations/blob/main/outputs/README.md) for a complete description of the files.
 
 
 
@@ -90,9 +104,10 @@ source("make.R")
 
 **Notes**
 
-- All required packages listed in the `DESCRIPTION` file will be installed (if necessary)
+- All required packages listed in the [`DESCRIPTION`](https://github.com/frbcesab/ethical-citations/blob/main/DESCRIPTION) file will be installed (if necessary)
 - All required packages and R functions will be loaded
-- Some analyses listed in the `make.R` might take time
+- Some steps listed in the [`make.R`](https://github.com/frbcesab/ethical-citations/blob/main/make.R) might take time (several hours)
+
 
 
 
@@ -100,7 +115,8 @@ source("make.R")
 
 Please use the following citation: 
 
-> **{{ ADD A CITATION }}**
+> ...
+
 
 
 
@@ -117,10 +133,10 @@ By contributing to this project, you agree to abide by its terms.
 
 ## Acknowledgments
 
-**{{ OPTIONAL SECTION }}**
+This project is a collaborative work among [FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/) postdocs.
 
 
 
 ## References
 
-**{{ OPTIONAL SECTION }}**
+...
