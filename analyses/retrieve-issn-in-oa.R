@@ -10,7 +10,7 @@ daphnee <- read.csv(here::here("data", "raw_data", "DAFNEE_db_081024.csv"))
 ## Select fields ----
 
 daphnee <- daphnee[daphnee$"Field" %in% c("ecology", "evolution/systematics", 
-                                          "general"), ]
+                                          "general, organisms"), ]
 
 
 ## Check for duplicates ----
@@ -56,6 +56,9 @@ for (i in 1:nrow(daphnee_journals)) {
   }
 }
 
+#bind issn to orig. daphnee
+daphnee<-left_join(daphnee, daphnee_journals, by=c('Journal'='journal'))
+write.csv(daphnee, 'data/raw_data/DAFNEE_db_081024.csv', row.names=FALSE)
 
 ## Try to match by ISSN ----
 
