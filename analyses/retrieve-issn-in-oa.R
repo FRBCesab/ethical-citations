@@ -62,10 +62,7 @@ write.csv(daphnee, 'data/raw_data/DAFNEE_db_081024.csv', row.names=FALSE)
 
 ## Try to match by ISSN ----
 
-impacts <- readxl::read_excel(here::here("data", "raw_data", 
-                                         "CathleenPetit_JCR_JournalResults_10_2024.xlsx"), 
-                              skip = 1)
-
+impacts <- read.csv(here::here("data", "Journals_from_clarivate.csv"))
 issn <- unique(daphnee_journals$oa_issn_l)
 issn <- issn[!is.na(issn)]
 
