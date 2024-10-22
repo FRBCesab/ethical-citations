@@ -1,69 +1,77 @@
-#' Retrieve ISSN for Daphnee Journals in OA database
+#' Retrieve ISSN for Dafnee Journals in OA database
 #' 
 
 
-## Read Daphnee database ----
+## Read Dafnee database ----
 
-daphnee <- read.csv(here::here("data", "raw_data", "DAFNEE_db_081024.csv"))
+dafnee_journals <- read.csv(here::here("data", "raw-data", "DAFNEE-20241022.csv"))
 
 
 ## Select fields ----
 
-daphnee <- daphnee[daphnee$"Field" %in% c("ecology", "evolution/systematics", 
-                                          "general, organisms"), ]
+dafnee_journals <- dafnee_journals[dafnee_journals$"Field" %in% c("ecology", "evolution/systematics", 
+                                                                  "general", "organisms"), ]
 
 
 ## Check for duplicates ----
 
-any(duplicated(daphnee$"Journal"))
+any(duplicated(dafnee_journals$"Journal"))
 
 
 ## Clean some Journal names ----
 
-daphnee_journals <- data.frame("journal"       = daphnee$"Journal",
-                               "journal_clean" = daphnee$"Journal")
+dafnee_journals$"journal_clean" <- dafnee_journals$"Journal"
 
-daphnee_journals$"journal_clean" <- gsub("Proceedings of the National Academy of Sciences of the USA", 
-                                         "Proceedings of the National Academy of Sciences", 
-                                         daphnee_journals$"journal_clean")
+dafnee_journals$"journal_clean" <- gsub("Proceedings of the National Academy of Sciences of the USA", 
+                                        "Proceedings of the National Academy of Sciences", 
+                                        dafnee_journals$"journal_clean")
 
 
 ## Prepare dataset ----
 
-daphnee_journals$"oa_journal_name" <- NA
-daphnee_journals$"oa_issn_l"       <- NA
-daphnee_journals$"oa_issn"         <- NA
+dafnee_journals$"oa_journal_name" <- NA
+dafnee_journals$"oa_issn_l"       <- NA
+dafnee_journals$"oa_issn"         <- NA
+dafnee_journals$"oa_journal_id"   <- NA
+dafnee_journals$"oa_n_papers"     <- NA
 
 
 ## Retrieve OA journal names and ISSN ----
 
-for (i in 1:nrow(daphnee_journals)) {
+for (i in 1:nrow(dafnee_journals)) {
   
   journal <- openalexR::oa_fetch(entity = "source",
-                                 search = daphnee_journals[i, "journal_clean"]) |>
+                                 search = dafnee_journals[i, "journal_clean"]) |>
     as.data.frame()
   
   if (nrow(journal) > 0) {
     
     journal <- journal[which.max(journal$"relevance_score"), ]
     
-    daphnee_journals[i, "oa_journal_name"] <- 
+    dafnee_journals[i, "oa_journal_name"] <- 
       journal[1, "display_name", drop = TRUE]
-    daphnee_journals[i, "oa_issn"]         <- 
+    
+    dafnee_journals[i, "oa_issn"]         <- 
       paste0(unlist(journal[1, "issn", drop = TRUE]), collapse = " | ")
-    daphnee_journals[i, "oa_issn_l"]       <- 
+    
+    dafnee_journals[i, "oa_issn_l"]       <- 
       journal[1, "issn_l", drop = TRUE]
+    
+    dafnee_journals[i, "oa_issn_l"]       <- 
+      journal[1, "issn_l", drop = TRUE]
+    
+    dafnee_journals[i, "oa_n_papers"]     <- 
+      journal[1, "works_count", drop = TRUE]
+    
+    dafnee_journals[i, "oa_journal_id"]     <- 
+      journal[1, "id", drop = TRUE]
   }
 }
 
-#bind issn to orig. daphnee
-daphnee<-left_join(daphnee, daphnee_journals, by=c('Journal'='journal'))
-write.csv(daphnee, 'data/raw_data/DAFNEE_db_081024.csv', row.names=FALSE)
+round(100 * sum(is.na(dafnee_journals$oa_n_papers)) / nrow(dafnee_journals), 0)
 
-## Try to match by ISSN ----
 
-impacts <- read.csv(here::here("data", "Journals_from_clarivate.csv"))
-issn <- unique(daphnee_journals$oa_issn_l)
-issn <- issn[!is.na(issn)]
+## Add ISSN to Dafnee info ----
 
-length(which(issn %in% impacts$ISSN))
+write.csv(dafnee_journals, here::here("data", "derived-data", "DAFNEE_db_with_issn.csv"), 
+          row.names = FALSE)
