@@ -22,7 +22,7 @@ devtools::load_all(here::here())
 
 ## Global Variables ----
 
-# You can list global variables here (or in a separate R script)
+options(openalexR.mailto = "nicolas.casajus@fondationbiodiversite.fr")
 
 
 ## Run Project ----
