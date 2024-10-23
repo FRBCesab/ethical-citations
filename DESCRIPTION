@@ -7,7 +7,9 @@ Authors@R: c(
            family  = "Casajus",
            role    = c("aut", "cre", "cph"),
            email   = "rdev.nc@gmail.com",
-           comment = c(ORCID = "0000-0002-5537-5294")))
+           comment = c(ORCID = "0000-0002-5537-5294")),
+    person(given   = "FRB-CESAB",
+           role    = "fnd"))
 Description: A paragraph providing a full description of the project (on 
     several lines...)
 URL: https://github.com/frbcesab/ethical-citations
