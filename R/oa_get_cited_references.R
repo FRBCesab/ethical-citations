@@ -28,9 +28,9 @@
 #' options(openalexR.mailto = 'rdev.nc@gmail.com')
 #' 
 #' ## Get cited references for one work (article) ----
-#' get_cited_references(doi = "10.1371/journal.pbio.3001640")
+#' oa_get_cited_references(doi = "10.1371/journal.pbio.3001640")
 
-get_cited_references <- function(doi) {
+oa_get_cited_references <- function(doi) {
   
   ## Check argument ----
   
