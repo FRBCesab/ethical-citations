@@ -1,13 +1,31 @@
 Package: ethical-citations
 Type: Package
-Title: The Title of the Project
+Title: Ethical Citations Project
 Version: 0.0.0.9000
 Authors@R: c(
     person(given   = "Nicolas",
            family  = "Casajus",
            role    = c("aut", "cre", "cph"),
            email   = "rdev.nc@gmail.com",
-           comment = c(ORCID = "0000-0002-5537-5294")))
+           comment = c(ORCID = "0000-0002-5537-5294")),
+    person(given   = "Miriam",
+           family  = "Beck",
+           role    = "aut",
+           comment = c(ORCID = "0000-0001-8179-3820")),
+    person(given   = "Camille",
+           family  = "Coux",
+           role    = "aut",
+           comment = c(ORCID = "0000-0002-6346-9194")),
+    person(given   = "Camille",
+           family  = "Coux",
+           role    = "aut",
+           comment = c(ORCID = "0000-0002-6346-9194")),
+    person(given   = "Cathleen",
+           family  = "Petit-Cailleux",
+           role    = "aut",
+           comment = c(ORCID = "0000-0001-7714-6583")),
+    person(given   = "FRB-CESAB",
+           role    = "fnd"))
 Description: A paragraph providing a full description of the project (on 
     several lines...)
 URL: https://github.com/frbcesab/ethical-citations
@@ -16,3 +34,9 @@ License: GPL (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Imports: 
+    here,
+    janitor,
+    openalexR,
+    pkgload,
+    remotes

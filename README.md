@@ -10,7 +10,6 @@
 <!-- badges: end -->
 
 <p align="left">
-
 • <a href="#overview">Overview</a><br> • <a href="#data-sources">Data
 sources</a><br> • <a href="#content">Content</a><br> •
 <a href="#installation">Installation</a><br> •
@@ -22,15 +21,16 @@ sources</a><br> • <a href="#content">Content</a><br> •
 
 ## Overview
 
-This project is dedicated to …
+This project is dedicated to…
 
 ## Data sources
 
 This project uses the following databases:
 
-| Database | Usage | Reference |   Link    |
-|:---------|:------|:----------|:---------:|
-| …        | …     | …         | [link](#) |
+| Database | Usage | Reference | Link |
+|:---|:---|:---|:--:|
+| Dafnee | Provide publisher business model | \- | [link](https://dafnee.isem-evolution.fr/) |
+| OpenAlex | Retrieve scientific publications | Priem J, Piwowar H & Orr R (2022) | [link](https://openalex.org/) |
 
 A comprehensive description of all these databases is available
 [here](https://github.com/frbcesab/ethical-citations/blob/main/data/README.md).
@@ -127,4 +127,6 @@ postdocs.
 
 ## References
 
-…
+Priem J, Piwowar H & Orr R (2022) OpenAlex: A fully-open index of
+scholarly works, authors, venues, institutions, and concepts. **ArXiv**.
+<https://arxiv.org/abs/2205.01833>.
