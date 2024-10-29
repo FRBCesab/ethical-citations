@@ -64,3 +64,5 @@ issn <- unique(daphnee_journals$oa_issn_l)
 issn <- issn[!is.na(issn)]
 
 length(which(issn %in% impacts$ISSN))
+
+MissingISSN <- daphnee_journals[!daphnee_journals$oa_issn_l %in% impacts$ISSN,]
