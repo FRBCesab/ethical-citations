@@ -40,8 +40,10 @@ nb_pages <- (nb_counts$count / 200) |> ceiling()
 ## Limit is 200, need to loop
 ## if 200, then check if more on page 2
 
+dois <- NA
 for (i in 1:nb_pages){
-  dois <- openalexR::oa_fetch(entity           = "works", 
+  dois <-c(
+    dois, openalexR::oa_fetch(entity           = "works", 
                               journal          = j_id,
                               publication_year = 2023,
                               per_page         = 200,
@@ -50,7 +52,10 @@ for (i in 1:nb_pages){
     as.data.frame() |> 
     
     _[ , "doi", drop = TRUE]
+    )
+  
 }
+dois <- dois[-1]
 
 
 # 21 dois for the 21 works cited in the j_id of 2023
@@ -107,7 +112,7 @@ citations <- lapply(1:length(dois), function(i) {
 ## lubridate::seconds_to_period(30*854*341) = "101d 2H 47M 0S"
 
   
-  citation_metadata <- lapply(1:length(unique(citations$citation_id)[n:(n+49)]), function(i){ ## remove the [1:5]
+  citation_metadata <- lapply(1:length(unique(citations$citation_id)), function(i){ 
     
     # oa id of the current citation
     cit <- unique(citations$citation_id)[i]
