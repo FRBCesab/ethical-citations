@@ -1,65 +1,41 @@
 #' Retrieve articles for DAFNEE Journals and for 2023
 #' 
+#' 100 journals ~ 5 min
 
-library(magrittr)
 
+start <- Sys.time()
 
 ## Import DAFNEE journals ----
 
-journals <- read.csv(here::here("data", "derived-data", "DAFNEE_db_with_impactact_Factor_filled.csv"))[,-1]
-
-j_id <- journals$oa_source_id[1]
-
+journals <- read.csv(here::here("data", "derived-data", 
+                                "DAFNEE_db_with_issn.csv"))
 
 
 ## Remove DAFNEE journals absent in OA ----
 
-round(100 * sum(is.na(journals$"oa_works_count")) / nrow(journals), 0)
-
-not_in_oa <- which(is.na(journals$"oa_works_count"))
-if (sum(not_in_oa) > 0) journals <- journals[-not_in_oa,]
-
-## Get articles for 2023 ----
-
-# oa_get_original_papers()
+journals <- journals[!is.na(journals$"oa_source_id"), ]
 
 
+## Get original articles for 2023 ----
 
-## Are there works for a journal and for a particular year ----
-
-nb_counts <-  openalexR::oa_fetch(entity           = "works", 
-                                  journal          = j_id, 
-                                  publication_year = 2023, 
-                                  count_only       = TRUE) |> 
+for (i in 1:nrow(journals)) {
   
-  as.data.frame()
-
-nb_pages <- (nb_counts$count / 200) |> ceiling()
-
-## Retrieve works DOI for the journal and one specific year ----
-## Limit is 200, need to loop
-## if 200, then check if more on page 2
-
-dois <- NA
-for (i in 1:nb_pages){
-  dois <-c(
-    dois, openalexR::oa_fetch(entity           = "works", 
-                              journal          = j_id,
-                              publication_year = 2023,
-                              per_page         = 200,
-                              pages            = i) |> 
-    
-    as.data.frame() |> 
-    
-    _[ , "doi", drop = TRUE]
-    )
+  cat("Retrieving original papers for journal", i, "on", nrow(journals), "\r")
   
+  articles <- oa_get_original_papers(journal_id = journals[i, "oa_source_id"], 
+                                     year       = 2023)
+  
+  journal_id <- gsub("https://openalex.org/", "", journals[i, "oa_source_id"])
+  
+  qs::qsave(x    = articles,
+            file = here::here("outputs", "original_papers", 
+                              paste0(journal_id, ".qs")))
+  
+  # Sys.sleep(sample(1:5))
 }
-dois <- dois[-1]
 
 
-# 21 dois for the 21 works cited in the j_id of 2023
-
+Sys.time() - start
 
 
 
