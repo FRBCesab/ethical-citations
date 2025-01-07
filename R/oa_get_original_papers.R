@@ -71,6 +71,7 @@ oa_get_original_papers <- function(journal_id, year) {
     articles <- data.frame(
       "oa_source_id"             = journal_id,
       "oa_work_id"               = articles$"id",
+      "oa_work_doi"              = articles$"doi",
       "oa_work_year"             = articles$"publication_year",
       "oa_referenced_works"      = list_to_str(articles$"referenced_works"))
     

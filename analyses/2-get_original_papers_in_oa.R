@@ -1,9 +1,10 @@
 #' Retrieve articles for DAFNEE Journals and for 2023
 #' 
-#' 100 journals ~ 5 min
+#' Duration ~ 15 min
 
 
 start <- Sys.time()
+
 
 ## Import DAFNEE journals ----
 
