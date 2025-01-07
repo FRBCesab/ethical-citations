@@ -3,7 +3,7 @@
 #' @description
 #' This function requests the OpenAlex database by using the package 
 #' `openalexR` and the function `oa_fetch()`. From a single source (journal 
-#' name), it retrieves its metadata (ISSN, source name in OA, source identifer).
+#' name), it retrieves metadata (ISSN, source name in OA, source identifier).
 #'
 #' @param journal a `character` of length 1. The journal name for which metadata
 #'   must be retrieved.
@@ -23,11 +23,13 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' ## Be polite ----
-#' options(openalexR.mailto = 'rdev.nc@gmail.com')
+#' options(openalexR.mailto = 'user.email@mail.com')
 #' 
-#' ## Get cited references for one work (article) ----
-#' oa_get_cited_references(doi = "10.1371/journal.pbio.3001640")
+#' ## Get journal metadata ----
+#' oa_get_journal_info(journal = "Applied Vegetation Science")
+#' }
 
 oa_get_journal_info <- function(journal) {
   
