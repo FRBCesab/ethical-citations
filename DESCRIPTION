@@ -39,4 +39,5 @@ Imports:
     janitor,
     openalexR,
     pkgload,
+    qs,
     remotes
