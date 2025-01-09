@@ -28,6 +28,6 @@ options(openalexR.mailto = "rdev.nc@gmail.com")
 ## Run Project ----
 
 # List all R scripts in a sequential order and using the following form:
-source(here::here("analyses", "1-get_journal_info_in_oa.R"))
-source(here::here("analyses", "2-get_original_papers_in_oa.R"))
+# source(here::here("analyses", "1-get_journal_info_in_oa.R"))
+# source(here::here("analyses", "2-get_original_papers_in_oa.R"))
 source(here::here("analyses", "3-get_cited_references_in_oa.R"))
