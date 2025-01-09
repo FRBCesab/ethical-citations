@@ -1,3 +1,37 @@
+#' Get original articles of a journal for a specific year
+#'
+#' @description
+#' This function requests the OpenAlex database by using the package 
+#' `openalexR` and the function `oa_fetch()`. From a single journal and a 
+#' specific year, it retrieves original articles metadata.
+#'
+#' @param journal_id a `character` of length 1. The OpenAlex identifier of the
+#'   journal.
+#'
+#' @param year an `integer` of length 1. The publication year
+#'
+#' @return A `data.frame` with one row per original article and the following 
+#' columns:
+#'   - `oa_source_id`: the OpenAlex identifier of the journal
+#'   - `oa_work_id`: the OpenAlex identifier of the original article
+#'   - `oa_work_doi`: the DOI of the original article
+#'   - `oa_work_year`: the publication year of the original article
+#'   - `oa_referenced_work_id`: the OpenAlex identifier of the cited works 
+#' 
+#' @note
+#' Before using this function, ensure that you ran: 
+#' `options(openalexR.mailto = 'your_email')`.
+#' 
+#' @export
+#'
+#' @examples
+#' ## Be polite ----
+#' options(openalexR.mailto = 'user.email@mail.com')
+#' 
+#' ## Get original articles for one journal and one year ----
+#' oa_get_original_papers(journal_id = "https://openalex.org/S2764636758",
+#'                        year       = 2023)
+
 oa_get_original_papers <- function(journal_id, year) {
   
   ## Check arguments ----
@@ -73,7 +107,7 @@ oa_get_original_papers <- function(journal_id, year) {
       "oa_work_id"               = articles$"id",
       "oa_work_doi"              = articles$"doi",
       "oa_work_year"             = articles$"publication_year",
-      "oa_referenced_works"      = list_to_str(articles$"referenced_works"))
+      "oa_referenced_work_id"    = list_to_str(articles$"referenced_works"))
     
     
     ## Remove duplicates ----
