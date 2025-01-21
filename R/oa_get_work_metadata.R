@@ -28,7 +28,7 @@
 #' oa_get_work_metadata(work_id = c("https://openalex.org/W788673684",
 #'                                  "https://openalex.org/W898153436"))
 
-oa_get_work_metadata <- function(work_id) {
+oa_get_work_metadata <- function(work_id, mc_cores = 20) {
   
   ## Check argument ----
   
@@ -59,24 +59,37 @@ oa_get_work_metadata <- function(work_id) {
   work_id <- work_id[!duplicated(work_id)]
   
   
-  ## Retrieve work metadata ----
+  ## Create batches ----
   
-  works <- suppressWarnings(
-    suppressMessages(
+  batches <- seq(1, length(work_id), by = 200)
+  batches <- sort(unique(c(batches, length(work_id) + 1)))
+  
+  
+  articles <- data.frame()
+  
+  for (k in 1:(length(batches) - 1)) {
     
-      openalexR::oa_fetch(entity           = "works", 
-                          identifier       = work_id,
-                          per_page         = 200,
-                          paging           = "cursor"))) |> 
+    ## Retrieve work metadata ----
+  
+    works <- suppressWarnings(
+      suppressMessages(
+      
+        openalexR::oa_fetch(entity           = "works", 
+                            identifier       = work_id[batches[k]:(batches[k + 1] - 1)],
+                            per_page         = 200))) |> 
+      
+      as.data.frame()
+  
+  
+    ## Clean work metadata ----
     
-    as.data.frame()
-  
-  
-  ## Clean work metadata ----
-  
-  articles <- data.frame(
-    "oa_referenced_work_id"        = works$"id",
-    "oa_referenced_work_source_id" = works$"so_id")
+    articles <- rbind(articles, data.frame(
+      "oa_referenced_work_id"        = works$"id",
+      "oa_referenced_work_source_id" = works$"so_id"))
+
+    Sys.sleep(sample(seq(0, 15, by = 1), 1))
+    
+  }
   
   articles <- articles[which(articles$"oa_referenced_work_id" %in% work_id), ]
   
