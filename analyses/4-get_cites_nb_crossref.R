@@ -115,7 +115,35 @@ for (j in 1:length(all_files)) {
       y = "OA vs CR %"
     )+ 
     theme_bw()
+  
+  
+#Exemple of journals with low % 
+  
+  dafnee_raw <- read.csv(here::here("data","derived-data","DAFNEE_db_with_issn.csv"))
+  
+  dafnee_raw$oa_source <- gsub("https://openalex.org/","",dafnee_raw$oa_source_id)
 
+  all_cr_per$jounal_name <- NA
+  for (i in 1:nrow(all_cr_per)){
+    #i=1
+    if (sum(dafnee_raw$oa_source%in%all_cr_per$journal[i])==1){
+      all_cr_per$jounal_name[i]=dafnee_raw$journal_clean[dafnee_raw$oa_source%in%all_cr_per$journal[i]]
+    } else {
+      all_cr_per$jounal_name[i]=NA
+    }
+  }
+  
+  all_cr_per <- all_cr_per[order(all_cr_per$av_per),]
+  
+  sum(is.na(all_cr_per$av_per)) #=> 29 journals do not have % (oa was zero)
+  
+  ##Ex lowest 
+  all_cr[all_cr$journal_oa_id%in%"S4210204291",]
+  
+  ##What are the journals with highest per ? 
+  
+  tail(all_cr_per[!is.na(all_cr_per$av_per),])
+  
 #Save the figure   
  
   all_jr_plot <- ggExtra::ggMarginal(p1, type = "histogram", fill = "lightblue")
@@ -123,3 +151,10 @@ for (j in 1:length(all_files)) {
   library(gridExtra)
   fig_cr_oa <- arrangeGrob(all_cr_plot,all_jr_plot,ncol=2) #generates g
   ggsave(file=here::here("figures","fig_cr_oa.tiff"), fig_cr_oa,width = 25, height = 12, dpi = 200, units = "cm", device='tiff') 
+
+#Solution ? 
+  
+    #=> either remove journals with low % or rather refs with low % 
+    #use crossref rather than oa ? 
+  
+  
