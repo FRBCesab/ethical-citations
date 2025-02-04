@@ -9,12 +9,12 @@ library(ggplot2)
 all_files <- list.files(here::here("outputs","original_papers"))
 
 for (j in 1:length(all_files)) {
-  #j=8
+  #j=1
   df <- qs::qread(here::here("outputs","original_papers",all_files[j]))
   
   if (nrow(df)>0){
     df_new <- do.call(rbind,lapply(1:nrow(df), function(i){
-      
+      #i=1
       if (i %% 200 == 0) {
         cat(".   Sleeping 10s ...\n")
         Sys.sleep(10)
@@ -46,7 +46,7 @@ for (j in 1:length(all_files)) {
  
 }
 
-  #=>Only 314 journals contained articles over the 337
+  #=>Only 314 journals files contained articles over the 337
 
 #Assemble all, compute % and plot 
 
@@ -61,7 +61,7 @@ for (j in 1:length(all_files)) {
   df_new <- all_cr[all_cr$cr != 0, ]
   df_new <- df_new[df_new$oa != 0, ]
   
-  #=> 6547 article had no cited works
+  #=> 6547 article had no cited works (all_cr=69882, df_new=63335)
   
   range <- range(c(df_new$oa, df_new$cr), na.rm = TRUE)
   
@@ -117,7 +117,7 @@ for (j in 1:length(all_files)) {
     theme_bw()
   
   
-#Exemple of journals with low % 
+#Example of journals with low % 
   
   dafnee_raw <- read.csv(here::here("data","derived-data","DAFNEE_db_with_issn.csv"))
   
@@ -152,9 +152,13 @@ for (j in 1:length(all_files)) {
   fig_cr_oa <- arrangeGrob(all_cr_plot,all_jr_plot,ncol=2) #generates g
   ggsave(file=here::here("figures","fig_cr_oa.tiff"), fig_cr_oa,width = 25, height = 12, dpi = 200, units = "cm", device='tiff') 
 
-#Solution ? 
+#What if you select article with at least 80% of ref in commun between open Alex and Crossref
   
-    #=> either remove journals with low % or rather refs with low % 
+  df_clean <- df_new[df_new$percentage>80,]
+  #=> 51508 : from the initial list 69882 we kept by 78% which is not so bad ... 
+  
+  
+#SOLUTIONS => either remove journals with low % or rather refs with low % 
     #use crossref rather than oa ? 
   
   
