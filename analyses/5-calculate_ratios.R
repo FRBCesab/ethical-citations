@@ -139,6 +139,31 @@ saveRDS(res_list, file='outputs/ratios_articlelevel_unfilteredraw.rds')
 write.csv(res_journallvl, file='outputs/ratios_journallevel_unfilteredraw.csv')
 
 
+x <- readRDS('outputs/ratios_articlelevel_unfilteredraw.rds')
+x <- do.call(rbind.data.frame, x)
+
+n_ref_min <- quantile(na.omit(x$n_refs), 0.2) ##########
+
+x <- x[x$n_refs > n_ref_min, ]
+
+
+## Aggregate by journal ----
+
+xxx <- x |> 
+  group_by(oa_source_id) |> 
+  summarise(
+    mean_prop_np  = mean("prop_np", na.rm = TRUE),
+    prop_fp       = mean("prop_fp", na.rm = TRUE),
+    prop_nadafnee = mean("prop_nadafnee", na.rm = TRUE),
+    prop_np_found = mean("prop_np_found", na.rm = TRUE),
+    prop_fp_found = mean("prop_fp_found", na.rm = TRUE)) |> 
+  ungroup()
+
+
+
+##### STOP
+
+
 #add journal name & dafnee status
 res_journallvl<- data.frame(res_journallvl)
 res_journallvl<- left_join(res_journallvl, dafnee, by='oa_source_id')
