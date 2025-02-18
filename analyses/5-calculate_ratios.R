@@ -20,7 +20,7 @@ list_refsfiles <- list.files(path = here::here("outputs", "cited_references"), f
 ## Journal dafnee info to match ----
 dafnee<- read.csv('data/derived-data/DAFNEE_db_with_issn.csv', header=T) #n=361
 dafnee<- dafnee[, c("oa_source_id", "oa_source_name", "journal", "publisher_type", "business_model", "institution_type")]
-dafnee<- dafnee[!is.na(dafnee$oa_source_id),] #n=341
+dafnee<- dafnee[!is.na(dafnee$oa_source_id),] #n=341 # CC: I get n=337 here
 
 #merge 'university press' into 'non-profit' --> DISCUSS/DECIDE
 dafnee$publisher_type[dafnee$publisher_type=='University Press'] <- 'Non-profit'
@@ -165,7 +165,7 @@ write.csv(xx, file='outputs/ratios_journallevel_unfiltered.csv', row.names=F)
 xx<- read.csv('outputs/ratios_journallevel_filtered_min5ref.csv')
 
 #quick view: results on publisher_type_level
-sum(is.na(xx$publisher_type)) #n=15 
+sum(is.na(xx$publisher_type)) #n=15 # CC: n=1
 
 #merge 'university press' into 'non-profit' --> DISCUSS/DECIDE
 # on first look it was same direction of ratios as non-profit (np > fp)
