@@ -144,35 +144,108 @@ x <- data.frame(do.call(rbind.data.frame, x))
 n_ref_min <- 5 #loosing n=7433
 x <- x[x$n_refs > n_ref_min, ]
 
-#include only articles with at least 80% of number of citations as in crossdef
-#TO DISCUSS
-
+#make sure still XX articles to be considered in ratio when excluding na_dafnee
+#--> ! loosing half of dataset but hardly changing anything??
+x <- x[(x$fp+x$np) > n_ref_min, ]
 
 xx <- x |> 
   group_by(oa_source_id) |>
   summarise(across(c(prop_np:prop_nadafnee), list(mean=mean, sd=sd), na.rm=TRUE)) |> 
   mutate(across(where(is.numeric), round, 4)) |>
   ungroup()
-  
+
+#merge 'university press' into 'non-profit' --> DISCUSS/DECIDE
+# on first look it was same direction of ratios as non-profit (np > fp)
 #add journal name & dafnee status
 xx<- left_join(xx, dafnee, by='oa_source_id')
-write.csv(xx, file='outputs/ratios_journallevel_unfiltered.csv', row.names=F)
+xx$publisher_type[xx$publisher_type=='University Press'] <- 'Non-profit'
+write.csv(xx, file='outputs/ratios_journallevel_filtered_min5ref_min5found.csv', row.names=F)
 
+#plots
+xx |> pivot_longer(contains('_mean'), names_to = 'ratio', values_to = 'value') |>
+  mutate(ratio= str_sub(ratio, end=-6)) |>
+  ggplot(aes(x=value)) +
+  geom_histogram() +
+  facet_grid(~ factor(ratio, levels=c('prop_np','prop_fp','prop_nadafnee','prop_np_found','prop_fp_found'))) +
+  theme_bw() +
+  ggtitle('journal-level filtered(5refs)')
 
+xx |> 
+  filter(!is.na(publisher_type)) |> 
+  pivot_longer(contains('found_mean'), names_to = 'ratio', values_to = 'value') |>
+  mutate(ratio= str_sub(ratio, end=-6)) |>#,
+        # ratio= factor(ratio, levels=c('prop_np','prop_fp','prop_nadafnee','prop_np_found','prop_fp_found'))) |>
+  ggplot(aes(x=ratio, y=value)) +
+  geom_violin(fill='palegreen', color = NA) +
+  geom_boxplot(alpha=0.2) +
+  theme_bw() +
+  facet_grid(~publisher_type) +
+  ggtitle('journal-level filtered(5refs)')
+
+#final figure 3:
+library(grid)
+library(gridExtra)
+p1<- xx |> 
+  pivot_longer(contains('found_mean'), names_to = 'ratio', values_to = 'value') |>
+  mutate(ratio= str_sub(ratio, end=-12)) |>
+  ggplot(aes(x=ratio, y=value)) +
+  geom_violin(fill='lightgray', color = NA) +
+  geom_boxplot(color='#666666', alpha=0.2) +
+  stat_summary(fun="mean",
+               geom="point",
+               colour="red") +
+  #geom_point(y=mean(value)) +
+  theme_bw() +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
+  labs(x=NULL, y=NULL, subtitle='Overall')
+
+p2<- xx |> filter(publisher_type=='Non-profit') |> 
+  pivot_longer(contains('found_mean'), names_to = 'ratio', values_to = 'value') |>
+  mutate(ratio= str_sub(ratio, end=-12)) |>
+  ggplot(aes(x=ratio, y=value)) +
+  geom_violin(fill='lightgray', color = NA) +
+  geom_boxplot(color='#666666', alpha=0.2) +
+  stat_summary(fun="mean",
+               geom="point",
+               colour="red") +
+  theme_bw() +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
+  labs(x=NULL, y=NULL, subtitle='Non-profit')
+
+p3<- xx |> filter(publisher_type=='For-profit') |> 
+  pivot_longer(contains('found_mean'), names_to = 'ratio', values_to = 'value') |>
+  mutate(ratio= str_sub(ratio, end=-12)) |>
+  ggplot(aes(x=ratio, y=value)) +
+  geom_violin(fill='lightgray', color = NA) +
+  geom_boxplot(color='#666666', alpha=0.2) +
+  stat_summary(fun="mean",
+               geom="point",
+               colour="red") +
+  theme_bw() +
+  theme(plot.subtitle = element_text(hjust = 0.5)) +
+  labs(x=NULL, y=NULL, subtitle='For-profit')
+
+ytext <- textGrob('Percent',rot=90, gp=gpar(fontsize=12))
+xtext<- textGrob('Publisher Type', gp=gpar(fontsize=12))
+combined_plot<-grid.arrange(p1, p2, p3, nrow=1, bottom=xtext, left=ytext) ## display plot
+ggsave(file='outputs/violinbox_journallevel_split_filtered_min5ref.png', combined_plot) 
 
 
 ## Aggregate by category level  ----
 xx<- read.csv('outputs/ratios_journallevel_filtered_min5ref.csv')
-
-#quick view: results on publisher_type_level
-sum(is.na(xx$publisher_type)) #n=15 # CC: n=1
-
-#merge 'university press' into 'non-profit' --> DISCUSS/DECIDE
-# on first look it was same direction of ratios as non-profit (np > fp)
-xx$publisher_type[xx$publisher_type=='University Press'] <- 'Non-profit'
 
 xx |> group_by(publisher_type) |>
   summarise(across(contains('mean'), mean, na.rm=TRUE)) |> 
   mutate(across(where(is.numeric), round, 4)) |>
   ungroup()
 
+xx |> 
+  pivot_longer(contains('mean'), names_to = 'ratio', values_to = 'value') |>
+  mutate(ratio= str_sub(ratio, end=-6),
+         ratio= factor(ratio, levels=c('prop_np','prop_fp','prop_nadafnee','prop_np_found','prop_fp_found'))) |>
+  ggplot(aes(x=ratio, y=value)) +
+  geom_violin(fill='seashell', color = NA) +
+  geom_boxplot(alpha=0.2) +
+  theme_bw() +
+  facet_grid(~publisher_type)  |>
+  ggtitle('journal-level filtered(5refs)')
