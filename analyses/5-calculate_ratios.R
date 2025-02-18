@@ -20,7 +20,7 @@ list_refsfiles <- list.files(path = here::here("outputs", "cited_references"), f
 ## Journal dafnee info to match ----
 dafnee<- read.csv('data/derived-data/DAFNEE_db_with_issn.csv', header=T) #n=361
 dafnee<- dafnee[, c("oa_source_id", "oa_source_name", "journal", "publisher_type", "business_model", "institution_type")]
-dafnee<- dafnee[!is.na(dafnee$oa_source_id),] #n=341
+dafnee<- dafnee[!is.na(dafnee$oa_source_id),] #n=341 # CC: I get n=337 here
 
 #merge 'university press' into 'non-profit' --> DISCUSS/DECIDE
 dafnee$publisher_type[dafnee$publisher_type=='University Press'] <- 'Non-profit'
