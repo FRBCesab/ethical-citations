@@ -57,13 +57,13 @@ for (i in 1:length(list_refsfiles)) { #1:length(list_refsfiles)
   
 
   if(!('fp' %in% names(res))){
-    res$fp <- NA
+    res$fp <- 0
   }
   if(!('np' %in% names(res))){
-    res$np <- NA
+    res$np <- 0
   }
   if(!('na_dafnee' %in% names(res))){
-    res$na_dafnee <- NA
+    res$na_dafnee <- 0
   }
   #make sure all columns are present (might miss if one category is absent)
   #res<- res %>% mutate(fp = ifelse("fp" %in% names(.), fp, NA),
@@ -249,3 +249,62 @@ xx |>
   theme_bw() +
   facet_grid(~publisher_type)  |>
   ggtitle('journal-level filtered(5refs)')
+
+
+###
+###
+###
+
+# Compute ratio (Nico alternative) ----
+
+## Import citations ----
+
+citations <- readRDS(here::here("outputs", "ratios_articlelevel_unfiltered.rds"))
+citations <- do.call(rbind, citations)
+
+
+## Add Dafnee journal information ----
+
+citations <- merge(citations, dafnee, by = "oa_source_id", all = FALSE)
+
+
+## Remove original papers w/ less than 5 citations (total) ----
+
+citations <- citations[citations$"n_refs" > 5, ]
+
+
+## Compute NP ratios ----
+
+np_journals <- citations[citations$"publisher_type" == "np", ]
+
+np_ratio <- np_journals$"np" / np_journals$"n_refs"
+mean(np_ratio)
+
+
+## Compute FP ratios ----
+
+fp_journals <- citations[citations$"publisher_type" == "fp", ]
+
+fp_ratio <- fp_journals$"fp" / fp_journals$"n_refs"
+mean(fp_ratio)
+
+
+## Remove original papers w/ no Dafnee citations (keep only found) ----
+
+citations_daf <- citations[which((citations$"n_refs" - citations$"na_dafnee") > 0), ]
+
+
+## Compute NP ratios (found) ----
+
+np_journals_daf <- citations_daf[citations_daf$"publisher_type" == "np", ]
+
+np_ratio_daf <- np_journals_daf$"np" / (np_journals_daf$"fp" + np_journals_daf$"np")
+mean(np_ratio_daf)
+
+
+## Compute FP ratios (found) ----
+
+fp_journals_daf <- citations_daf[citations_daf$"publisher_type" == "fp", ]
+
+fp_ratio_daf <- fp_journals_daf$"fp" / (fp_journals_daf$"fp" + fp_journals_daf$"np")
+mean(fp_ratio_daf)
