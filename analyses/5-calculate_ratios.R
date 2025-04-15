@@ -8,10 +8,6 @@
 #- mean & sd prop_np and prop_fp
 #- # articles
 
-#To Do:
-#- additional filtering of articles (at least 80% of refs found in crossref)
-#  and journals (based on quantile, exclude journals publishing extreme numbers of articles)
-
 library(dplyr)
 
 ## List original article files ----
@@ -157,6 +153,7 @@ xx <- x |>
 #merge 'university press' into 'non-profit' --> DISCUSS/DECIDE
 # on first look it was same direction of ratios as non-profit (np > fp)
 #add journal name & dafnee status
+dafnee<- read.csv('data/derived-data/DAFNEE_db_with_issn.csv', header=T)
 xx<- left_join(xx, dafnee, by='oa_source_id')
 xx$publisher_type[xx$publisher_type=='University Press'] <- 'Non-profit'
 write.csv(xx, file='outputs/ratios_journallevel_filtered_min5ref_min5found.csv', row.names=F)
@@ -228,7 +225,30 @@ p3<- xx |> filter(publisher_type=='For-profit') |>
 ytext <- textGrob('Percent',rot=90, gp=gpar(fontsize=12))
 xtext<- textGrob('Publisher Type', gp=gpar(fontsize=12))
 combined_plot<-grid.arrange(p1, p2, p3, nrow=1, bottom=xtext, left=ytext) ## display plot
-ggsave(file='outputs/violinbox_journallevel_split_filtered_min5ref.png', combined_plot) 
+ggsave(file='figures/violinbox_journallevel_split_filtered_min5ref.png', combined_plot) 
+
+
+#final figure (NP only)
+p<- xx |> 
+  filter(!is.na(publisher_type)) |> 
+  ggplot(aes(x=publisher_type, y=prop_np_found_mean)) +
+  geom_violin(fill='lightgray', color = NA) +
+  geom_boxplot(alpha=0.2) +
+  xlab('Journals publisher type') + ylab('Proportion NP citations') +
+  theme_bw() +
+  ggtitle('journal-level filtered(5refs)')
+ggsave(file='../figures/violinbox_journallevel_violin_NPonly.png', p) 
+
+
+#quick T test
+np<- xx[xx$publisher_type=='Non-profit', "prop_np_found_mean"]
+fp<- xx[xx$publisher_type=='For-profit', "prop_np_found_mean"]
+t.test(np, fp, alternative=c("two.sided"))
+
+#check conditions ()
+#normality:
+shapiro.test(xx$prop_np_found_mean[xx$publisher_type %in% c('np', 'fp')])
+
 
 
 ## Aggregate by category level  ----
