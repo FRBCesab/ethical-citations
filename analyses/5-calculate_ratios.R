@@ -158,7 +158,44 @@ xx<- left_join(xx, dafnee, by='oa_source_id')
 xx$publisher_type[xx$publisher_type=='University Press'] <- 'Non-profit'
 write.csv(xx, file='outputs/ratios_journallevel_filtered_min5ref_min5found.csv', row.names=F)
 
-#plots
+#final figure (NP only)
+library(ggdist)
+library(EnvStats)
+
+p<- xx |> 
+  filter(!is.na(publisher_type)) |> 
+  ggplot(aes(x=publisher_type, y=prop_np_found_mean, fill=publisher_type)) +
+  #geom_violin(fill='lightgray', color = NA) +
+  geom_boxplot(alpha=.6, width= .48, outlier.shape=21) +
+  ggdist::stat_halfeye(adjust= .5,
+                       width= .6,
+                       .width= 0,
+                       alpha= 1, point_colour=NA) +
+  scale_fill_manual(values=c('salmon', 'slateblue')) +
+  xlab('Journals publisher type') + ylab('Proportion NP citations') +
+  ylim(0,1) +
+  theme_bw() +
+  stat_n_text(size=3) +
+  theme(legend.position='none',
+        panel.grid.major.y=element_blank(), 
+        panel.border=element_blank(),
+        axis.line.x=element_line(), axis.line.y=element_line()) #+
+  #ggtitle('journal-level filtered(5refs)')
+p
+ggsave(p, file='figures/final_journallevel_violinbox_NPonly.png', dpi=200, width=3.5, height=3.5) 
+
+
+#quick T test
+np<- xx[xx$publisher_type=='Non-profit', "prop_np_found_mean"]
+fp<- xx[xx$publisher_type=='For-profit', "prop_np_found_mean"]
+t.test(np, fp, alternative=c("two.sided"))
+
+#check conditions ()
+#normality:
+shapiro.test(xx$prop_np_found_mean[xx$publisher_type %in% c('np', 'fp')])
+
+
+#Other plots (maybe to delete)
 xx |> pivot_longer(contains('_mean'), names_to = 'ratio', values_to = 'value') |>
   mutate(ratio= str_sub(ratio, end=-6)) |>
   ggplot(aes(x=value)) +
@@ -171,7 +208,7 @@ xx |>
   filter(!is.na(publisher_type)) |> 
   pivot_longer(contains('found_mean'), names_to = 'ratio', values_to = 'value') |>
   mutate(ratio= str_sub(ratio, end=-6)) |>#,
-        # ratio= factor(ratio, levels=c('prop_np','prop_fp','prop_nadafnee','prop_np_found','prop_fp_found'))) |>
+  # ratio= factor(ratio, levels=c('prop_np','prop_fp','prop_nadafnee','prop_np_found','prop_fp_found'))) |>
   ggplot(aes(x=ratio, y=value)) +
   geom_violin(fill='palegreen', color = NA) +
   geom_boxplot(alpha=0.2) +
@@ -226,28 +263,6 @@ ytext <- textGrob('Percent',rot=90, gp=gpar(fontsize=12))
 xtext<- textGrob('Publisher Type', gp=gpar(fontsize=12))
 combined_plot<-grid.arrange(p1, p2, p3, nrow=1, bottom=xtext, left=ytext) ## display plot
 ggsave(file='figures/violinbox_journallevel_split_filtered_min5ref.png', combined_plot) 
-
-
-#final figure (NP only)
-p<- xx |> 
-  filter(!is.na(publisher_type)) |> 
-  ggplot(aes(x=publisher_type, y=prop_np_found_mean)) +
-  geom_violin(fill='lightgray', color = NA) +
-  geom_boxplot(alpha=0.2) +
-  xlab('Journals publisher type') + ylab('Proportion NP citations') +
-  theme_bw() +
-  ggtitle('journal-level filtered(5refs)')
-ggsave(file='../figures/violinbox_journallevel_violin_NPonly.png', p) 
-
-
-#quick T test
-np<- xx[xx$publisher_type=='Non-profit', "prop_np_found_mean"]
-fp<- xx[xx$publisher_type=='For-profit', "prop_np_found_mean"]
-t.test(np, fp, alternative=c("two.sided"))
-
-#check conditions ()
-#normality:
-shapiro.test(xx$prop_np_found_mean[xx$publisher_type %in% c('np', 'fp')])
 
 
 
