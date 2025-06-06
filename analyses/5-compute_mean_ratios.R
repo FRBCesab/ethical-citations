@@ -1,4 +1,9 @@
+#'
+#' Compute NP and FP citations ratios per journal and per publisher type
+#'
+
 ## Import Dafnee info ----
+
 dafnee <- read.csv(
   file = here::here(
     "data",
@@ -9,6 +14,7 @@ dafnee <- read.csv(
 
 
 ## Import aggregated references ----
+
 citations <- readRDS(
   file = here::here(
     "outputs",
@@ -27,6 +33,7 @@ pos <- which(citations$"publisher_type" == "University Press")
 if (length(pos) > 0) {
   citations[pos, "publisher_type"] <- "Non-profit"
 }
+
 
 ## Remove original papers w/ less than 5 citations (found in Dafnee) ----
 
@@ -132,6 +139,8 @@ ratios[2, "np_sd"] <- round(sd(fp_np_ratio), 2)
 
 rownames(ratio_per_journals) <- NULL
 
+
+## Export results ----
 
 write.csv(
   x = ratio_per_journals,

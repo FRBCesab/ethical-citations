@@ -1,33 +1,33 @@
 #' ethical-citations: A Research Compendium
-#' 
-#' @description 
-#' A paragraph providing a full description of the project and describing each 
+#'
+#' @description
+#' A paragraph providing a full description of the project and describing each
 #' step of the workflow.
-#' 
+#'
 #' @author Nicolas Casajus \email{rdev.nc@gmail.com}
-#' 
-#' @date 2024/07/09
+#'
+#' @date 2025/06/06
 
-
-
-## Install Dependencies (listed in DESCRIPTION) ----
+## Install dependencies (listed in DESCRIPTION) ----
 
 remotes::install_deps(upgrade = "never")
 
 
-## Load Project Addins (R Functions and Packages) ----
+## Load project addins (R functions and packages) ----
 
-pkgload::load_all(here::here())
+pkgload::load_all()
 
 
-## Global Variables ----
+## Global variables ----
 
 options(openalexR.mailto = "rdev.nc@gmail.com")
 
 
-## Run Project ----
+## Run project ----
 
-# List all R scripts in a sequential order and using the following form:
 # source(here::here("analyses", "1-get_journal_info_in_oa.R"))
 # source(here::here("analyses", "2-get_original_papers_in_oa.R"))
-source(here::here("analyses", "3-get_cited_references_in_oa.R"))
+# source(here::here("analyses", "3-get_cited_references_in_oa.R"))
+source(here::here("analyses", "4-aggregate_cited_references.R"))
+source(here::here("analyses", "5-compute_mean_ratios.R"))
+source(here::here("analyses", "6-violin_plots.R"))

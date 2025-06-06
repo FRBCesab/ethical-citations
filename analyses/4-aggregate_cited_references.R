@@ -1,26 +1,28 @@
-# For each article ('oa_work_id') calculate:
-#- number of refs not in dafnee (i.e. giving 'NA')
-#- # total references
-#- # count for-profit (fp) and non-profit (np) journals
-#- proportion of fp (np) journals considering those that are in dafnee and identified as either np/fp ('prop_np_found', 'prop_fp_found') and overall ('prop_np', 'prop_fp)
-
-#For each journal:
-#- mean & sd prop_np and prop_fp
-#- # articles
+#'
+#' Compute number of citations per article
+#'
+#' In particular:
+#' - n_refs: total number of citations indexed in OA database
+#' - np: number of citations of non-profit journals
+#' - fp: number of citations of for-profit journals
+#' - na_dafnee: number of citations of journals missing in Dafnee database
 
 ## List cited reference files ----
+
 list_refsfiles <- list.files(
   path = here::here("outputs", "cited_references"),
   full.names = TRUE
 )
 
 ## Import Dafnee info ----
+
 dafnee <- read.csv(
   file = here::here("data", "derived-data", "DAFNEE_db_with_issn.csv")
 )
 
 
 ## Clean Dafnee info ----
+
 dafnee <- dafnee[, c(
   "oa_source_id",
   "oa_source_name",
@@ -46,14 +48,13 @@ dafnee <- dafnee |>
   )
 
 
-## Compute number of citations per publisher type ----
+## Compute number of citations per article ----
 
 res_list <- list()
 
 for (i in 1:length(list_refsfiles)) {
   df <- qs::qread(list_refsfiles[i])
 
-  #bind dafnee table
   df <- dplyr::left_join(
     df,
     dafnee,
@@ -103,13 +104,14 @@ for (i in 1:length(list_refsfiles)) {
     "na_dafnee"
   )]
 
-  # bind results
   res_list <- append(res_list, list(res))
 
   print(i)
 }
 
+
 ## Export results ----
+
 saveRDS(
   res_list,
   file = here::here("outputs", "number_of_cited_references_per_paper.rds")

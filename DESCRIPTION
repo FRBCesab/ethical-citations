@@ -1,7 +1,7 @@
 Package: ethical-citations
 Type: Package
 Title: Ethical Citations Project
-Version: 0.0.0.9000
+Version: 0.0.1
 Authors@R: c(
     person(given   = "Nicolas",
            family  = "Casajus",
@@ -16,28 +16,42 @@ Authors@R: c(
            family  = "Coux",
            role    = "aut",
            comment = c(ORCID = "0000-0002-6346-9194")),
-    person(given   = "Camille",
-           family  = "Coux",
+    person(given   = "Nicolas",
+           family  = "Mouquet",
            role    = "aut",
-           comment = c(ORCID = "0000-0002-6346-9194")),
+           comment = c(ORCID = "0000-0003-1840-6984")),
     person(given   = "Cathleen",
            family  = "Petit-Cailleux",
            role    = "aut",
            comment = c(ORCID = "0000-0001-7714-6583")),
     person(given   = "FRB-CESAB",
            role    = "fnd"))
-Description: A paragraph providing a full description of the project (on 
-    several lines...)
+Description: Research compendium to reproduce analyses and figures of the 
+    article 'Strategic citations for a fairer academic landscape' by Beck et al.
+    submitted to Proc B - Biological Science Practices.
 URL: https://github.com/frbcesab/ethical-citations
 BugReports: https://github.com/frbcesab/ethical-citations/issues
 License: GPL (>= 2)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
+Depends: 
+    ggplot2
 Imports: 
+    dplyr,
+    EnvStats,
+    ggdist,
     here,
     janitor,
     openalexR,
-    pkgload,
     qs,
-    remotes
+    stringi,
+    stringr,
+    tidyr
+Suggests: 
+    ggExtra,
+    grid,
+    gridExtra,
+    httr,
+    jsonlite,
+    pbmcapply

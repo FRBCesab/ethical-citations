@@ -1,4 +1,8 @@
-library(ggplot2)
+#'
+#' Create a violin plot of proportion of NP citations for FP and NP publishers
+#'
+#' Figure 2 of the article
+#'
 
 ## Import ratio per journal ----
 
@@ -39,6 +43,9 @@ violin <- ratios |>
     axis.line.x = element_line(),
     axis.line.y = element_line()
   )
+
+
+## Save figure ----
 
 ggsave(
   violin,
