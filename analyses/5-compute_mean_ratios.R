@@ -35,6 +35,11 @@ if (length(pos) > 0) {
 }
 
 
+## Remove original papers w/ no citations (found in Dafnee) ----
+
+citations <- citations[citations$"n_refs" > citations$"na_dafnee", ]
+
+
 ## Remove original papers w/ less than 5 citations (found in Dafnee) ----
 
 citations <- citations[(citations$"fp" + citations$"np") > 5, ]
