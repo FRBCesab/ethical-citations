@@ -14,10 +14,12 @@ knitr::opts_chunk$set(collapse  = TRUE,
 
 
 
-ethical-citations <img src="https://raw.githubusercontent.com/FRBCesab/templates/main/logos/compendium-sticker.png" align="right" style="float:right; height:120px;"/>
+Fair citations <img src="https://raw.githubusercontent.com/FRBCesab/templates/main/logos/compendium-sticker.png" align="right" style="float:right; height:120px;"/>
 =========================================================
 
 <!-- badges: start -->
+![Research compendium](https://img.shields.io/static/v1?message=Compendium&logo=r&labelColor=5c5c5c&color=yellowgreen&logoColor=white&label=%20)
+![Lifecycle Stable](https://img.shields.io/badge/Lifecycle-Stable-97ca00)
 [![License: GPL (>= 2)](https://img.shields.io/badge/License-GPL%20%28%3E%3D%202%29-blue.svg)](https://choosealicense.com/licenses/gpl-2.0/)
 <!-- badges: end -->
 
@@ -39,8 +41,9 @@ ethical-citations <img src="https://raw.githubusercontent.com/FRBCesab/templates
 
 ## Overview
 
-This project is dedicated to...
+Research compendium to reproduce analyses and figures of the following article:
 
+> Strategic citations for a fairer academic landscape, by Beck M, Busana M, Birre D, Oliveira B, Vagnon C, Marino C, Coux C, Casajus N, Mouquet N, Unkula M, Veytia D, Petit-Cailleux C, Nicvert L, Speakman C & Annasawmy PA. Submitted to Proc B - Biological Science Practices.
 
 
 ## Data sources
@@ -53,14 +56,18 @@ This project uses the following databases:
 | Dafnee     | Provide publisher business model | -                                 | [link](https://dafnee.isem-evolution.fr/) |
 | OpenAlex   | Retrieve scientific publications | Priem J, Piwowar H & Orr R (2022) | [link](https://openalex.org/)             |
 
-A comprehensive description of all these databases is available [here](https://github.com/frbcesab/ethical-citations/blob/main/data/README.md).
 
 
 ## Workflow
 
 The analysis pipeline follows these steps:
 
-1. ...
+1. Retrieve Dafnee journal metadata in OpenAlex
+2. Retrieve articles metadata for these journals in 2023 (using OpenAlex)
+3. Retrieve cited references for these articles (using OpenAlex)
+4. Aggregate citation by types (non-profit & for-profit) for each article
+5. Compute citation ratios (NP & FP) per journal and per publishing model
+6. Plot the distribution of journal ratios
 
 
 ## Content
@@ -71,13 +78,15 @@ This repository is structured as follow:
 
 - [`make.R`](https://github.com/frbcesab/ethical-citations/blob/main/make.R): main R script to set up and run the entire project. Open this file to follow the workflow step by step.
 
+- [`data/`](https://github.com/frbcesab/ethical-citations/blob/main/data): contains raw data used in this project.
+
 - [`R/`](https://github.com/frbcesab/ethical-citations/blob/main/R): contains R functions developed especially for this project.
 
-- [`data/`](https://github.com/frbcesab/ethical-citations/blob/main/data): contains raw data used in this project. See the [`README`](https://github.com/frbcesab/ethical-citations/blob/main/data/README.md) for further information.
+- [`analyses/`](https://github.com/frbcesab/ethical-citations/blob/main/analyses): contains R scripts used in this project and called by the [`make.R`](https://github.com/frbcesab/ethical-citations/blob/main/make.R).
 
-- [`figures/`](https://github.com/frbcesab/ethical-citations/blob/main/figures): contains the figures of the project. See the [`README`](https://github.com/frbcesab/ethical-citations/blob/main/figures/README.md) for a complete description of the files.
+- [`figures/`](https://github.com/frbcesab/ethical-citations/blob/main/figures): contains the figures of the project.
 
-- [`outputs/`](https://github.com/frbcesab/ethical-citations/blob/main/outputs): contains the outputs of the project. See the [`README`](https://github.com/frbcesab/ethical-citations/blob/main/outputs/README.md) for a complete description of the files.
+- [`outputs/`](https://github.com/frbcesab/ethical-citations/blob/main/outputs): contains the outputs of the project.
 
 
 
@@ -116,7 +125,7 @@ source("make.R")
 
 Please use the following citation: 
 
-> ...
+> Coming soon...
 
 
 
@@ -134,7 +143,7 @@ By contributing to this project, you agree to abide by its terms.
 
 ## Acknowledgments
 
-This project is a collaborative work among [FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/) postdocs.
+This project is a collaborative work among [FRB-CESAB](https://www.fondationbiodiversite.fr/en/about-the-foundation/le-cesab/) scientific team.
 
 
 
