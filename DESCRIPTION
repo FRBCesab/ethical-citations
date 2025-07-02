@@ -45,6 +45,7 @@ Imports:
     janitor,
     openalexR,
     qs,
+    stringdist,
     stringi,
     stringr,
     tidyr
