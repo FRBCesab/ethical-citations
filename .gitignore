@@ -21,3 +21,5 @@ README.html
 inst/doc
 man/
 NAMESPACE
+
+additional_stuff/

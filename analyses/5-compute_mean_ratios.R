@@ -71,6 +71,7 @@ get_ratios <- function(data, business_model, is_academic) {
   ]
   
   total <- data$fp_nonacademic + data$fp_academic + data$np
+  #total<- data$n_refs #maybe for SUPP
   
   data$fp_nonacademic <- data$fp_nonacademic / total
   data$fp_academic <- data$fp_academic / total
@@ -154,44 +155,6 @@ write.csv(
   row.names = FALSE
 )
 
-#plot journal level
-library(EnvStats)
-p<-ratio_per_journals %>% 
-  pivot_longer(fp_nonacademic:np, names_to='cat', values_to='value') %>%
-  mutate(journal_cat = paste(business_model, is_academic, sep='_'),
-         journal_cat = recode(journal_cat, 'FP_FALSE' = 'FP non-academic', 
-                              'FP_TRUE' = 'FP academic',
-                              'NP_TRUE' = 'NP'),
-         journal_cat = factor(journal_cat, levels=c('FP non-academic', 'FP academic', 'NP')),
-         cat = factor(cat, levels=c('fp_nonacademic', 'fp_academic', 'np')),
-         cat = recode(cat, 'fp_nonacademic' = 'FP non-academic',
-                      'fp_academic' = 'FP academic',
-                      'np' = 'NP')) %>%
-  filter(cat == 'NP') %>% #add for single type plot
-  ggplot(aes(x=journal_cat, y=value)) + #, fill=journal_cat
-  #geom_violin(fill='lightgray', color = NA) +
-  geom_boxplot(alpha=.6, width= .48, outlier.shape=21, outlier.alpha = 0, fill='#dddddd') +
-  ggdist::stat_halfeye(adjust= .5,
-                       width= .6,
-                       .width= 0,
-                       alpha= 1, point_colour=NA,
-                       fill='#888888'
-  ) +
-  #facet_wrap(~cat) + #remove for single type plot
-  #scale_fill_manual(values=c('#745392', '#909278', '#b0c700')) +#'#898584'  # '#c3c4b5' '#909278'
-  #scale_fill_manual(values=c('#777777', '#777777', '#777777')) +#for single type plot
-  xlab('Publisher type') + ylab('Citation of NP refs (%)') +
-  ylim(0,1) +
-  theme_bw() +
-  stat_n_text(size=3) +
-  theme(legend.position='none', #'none' for single type plot
-        panel.grid.major.y=element_blank(), 
-        panel.border=element_blank(),
-        #axis.text.x=element_blank(), #remove for single type plot
-        axis.line.x=element_line(), axis.line.y=element_line()) #+
-p
-ggsave(p, file='figures/final_journallevel_violinbox_all.png', dpi=200, width=6, height=3.5)
-ggsave(p, file='figures/final_journallevel_violinbox_np.png', dpi=200, width=3.5, height=3.5)
 
 
 #ANOVA/Kruskal-Wallis
@@ -204,7 +167,8 @@ pairwise.wilcox.test(ratio_per_journals$np, ratio_per_journals$journal_cat,
 #sig: FP-academic citations between FP_academic-FP_nonacademic, FP_academic-NP
 #sig: FP-nonacademic citations between FP_nonacademic-FP_academic, FP_nonacademic-NP
 
-#final counts for MM/Sup (can be deleted in the end)
+
+#simple  counts for MM/Sup (can be deleted in the end)
 #(to be run before each step of filtering)
 citations %>% mutate(journal_cat = paste(publisher_type, is_dafnee, sep='_')) %>%
   mutate(nref_included=n_refs-na_dafnee_na) %>%
@@ -242,8 +206,27 @@ ratios %>%
   facet_wrap(~cat) +
   theme_bw()
 
+citations %>% mutate(journal_cat = paste(publisher_type, is_dafnee, sep='_')) %>%
+  mutate(nref_included=n_refs-na_dafnee_na) %>%
+  summarise(n=sum(nref_included),
+            mean=mean(nref_included),
+            sd=sd(nref_included),
+            med=median(nref_included))
 
+#table for supp:
+for_tab<- citations
+for_tab$journal_cat<- paste(for_tab$publisher_type, for_tab$is_dafnee, sep='_')
+for_tab <- for_tab %>% distinct(oa_source_name, journal_cat)
+split_list <- split(for_tab$oa_source_name, for_tab$journal_cat)
+split_list <- lapply(split_list, sort)
+max_len <- max(sapply(split_list, length))
 
+padded <- lapply(split_list, function(x) {
+  length(x) <- max_len
+  return(x)
+})
+tab <- as.data.frame(padded, stringsAsFactors = FALSE)
+write.csv2(tab, 'Supp_journal_list.csv')
 
 # ratio_per_journals <- rbind(
 #   ratio_per_journals,
