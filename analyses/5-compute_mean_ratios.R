@@ -245,6 +245,78 @@ ratios %>%
 
 
 
+
+#ANOVA/Kruskal-Wallis
+ratio_per_journals$journal_cat<- paste(ratio_per_journals$business_model, ratio_per_journals$is_academic, sep='_')
+kruskal.test( ~ journal_cat, data = ratio_per_journals)
+pairwise.wilcox.test(ratio_per_journals$np, ratio_per_journals$journal_cat,
+                     p.adjust.method = "bonferroni") #same result for 'BH'
+
+#sig: NP citations between all three journal types
+#sig: FP-academic citations between FP_academic-FP_nonacademic, FP_academic-NP
+#sig: FP-nonacademic citations between FP_nonacademic-FP_academic, FP_nonacademic-NP
+
+
+#simple  counts for MM/Sup (can be deleted in the end)
+#(to be run before each step of filtering)
+citations %>% mutate(journal_cat = paste(publisher_type, is_dafnee, sep='_')) %>%
+  mutate(nref_included=n_refs-na_dafnee_na) %>%
+  #group_by(journal_cat) %>%
+  summarise(n_articles=n(),
+            n_refs=sum(nref_included))
+
+n_distinct(citations$oa_source_name)
+
+#number of articles per journal
+citations %>% mutate(journal_cat = paste(publisher_type, is_dafnee, sep='_')) %>%
+  mutate(nref_included=n_refs-na_dafnee_na) %>%
+  group_by(oa_source_name) %>%
+  summarise(n_articles=n(),
+            n_refs=sum(nref_included)) %>% ungroup() %>%
+  summarise(mean_articles=mean(n_articles),
+            med_articles=median(n_articles),
+            sd_articles=sd(n_articles))
+
+#number of refs per article
+citations %>% mutate(journal_cat = paste(publisher_type, is_dafnee, sep='_')) %>%
+  mutate(nref_included=n_refs-na_dafnee_na) %>%
+  summarise(mean_refs=mean(nref_included),
+            med_refs=median(nref_included),
+            sd_refs=sd(nref_included))
+
+
+#plot mean/sd
+ratios %>% 
+  pivot_longer(fp_nonacademic:np, names_to='cat', values_to='value') %>%
+  mutate(journal_cat = paste(business_model, is_academic, sep='_'),
+         cat= factor(cat, levels=c('fp_nonacademic', 'fp_academic', 'np'))) %>%
+  ggplot(., aes(x=journal_cat, y=value)) +
+  geom_point() +
+  facet_wrap(~cat) +
+  theme_bw()
+
+citations %>% mutate(journal_cat = paste(publisher_type, is_dafnee, sep='_')) %>%
+  mutate(nref_included=n_refs-na_dafnee_na) %>%
+  summarise(n=sum(nref_included),
+            mean=mean(nref_included),
+            sd=sd(nref_included),
+            med=median(nref_included))
+
+#table for supp:
+for_tab<- citations
+for_tab$journal_cat<- paste(for_tab$publisher_type, for_tab$is_dafnee, sep='_')
+for_tab <- for_tab %>% distinct(oa_source_name, journal_cat)
+split_list <- split(for_tab$oa_source_name, for_tab$journal_cat)
+split_list <- lapply(split_list, sort)
+max_len <- max(sapply(split_list, length))
+
+padded <- lapply(split_list, function(x) {
+  length(x) <- max_len
+  return(x)
+})
+tab <- as.data.frame(padded, stringsAsFactors = FALSE)
+write.csv2(tab, 'Supp_journal_list.csv')
+
 # ratio_per_journals <- rbind(
 #   ratio_per_journals,
 #   data.frame(
