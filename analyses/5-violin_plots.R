@@ -1,28 +1,33 @@
-#'
 #' Create a violin plot of proportion of FP/FP-academic/NP citations for the three publisher types
 #'
 #' Figure 2 of the article
-#'
-library(dplyr)
-library(ggplot2)
-library(ggdist)
-library(ggpubr)
-library(gridExtra)  
-library(grid)
-library(EnvStats)
-library(FSA)
-library(tidyr)
 
 ## Import ratio per journal ----
-ratios <- read.csv(here::here('outputs','mean_ratio_per_journal.csv'))
+ratios <- read.csv(here::here('outputs', 'mean_ratio_per_journal.csv'))
 
 #rename ref categories
-names(ratios)[names(ratios) %in% c("fp_nonacademic", "fp_academic", "np")] <- c("FP", "FP_acad", "NP")
+names(ratios)[names(ratios) %in% c("fp_nonacademic", "fp_academic", "np")] <- c(
+  "FP",
+  "FP_acad",
+  "NP"
+)
 
 #create single publisher type column, adapt labels and set order
-ratios$publisher_type<- paste(ratios$business_model, ratios$is_academic, sep='_')
-ratios$publisher_type<- factor(ratios$publisher_type, levels=c('FP_FALSE', 'FP_TRUE', 'NP_TRUE'))
-ratios$publisher_type<- forcats::fct_recode(ratios$publisher_type, 'FP'='FP_FALSE', 'FP acad'='FP_TRUE', 'NP'='NP_TRUE')
+ratios$publisher_type <- paste(
+  ratios$business_model,
+  ratios$is_academic,
+  sep = '_'
+)
+ratios$publisher_type <- factor(
+  ratios$publisher_type,
+  levels = c('FP_FALSE', 'FP_TRUE', 'NP_TRUE')
+)
+ratios$publisher_type <- forcats::fct_recode(
+  ratios$publisher_type,
+  'FP' = 'FP_FALSE',
+  'FP acad' = 'FP_TRUE',
+  'NP' = 'NP_TRUE'
+)
 
 #One panel per type of reference that is cited, publisher type on x axis
 #Containing stats (pairwise t-tests)m testing for sig differences in citation of i.e. NP among publisher types
@@ -34,43 +39,43 @@ plot_list <- lapply(1:length(vars), function(i) {
   varname <- vars[i]
 
   # Perform Dunn’s test with Bonferroni correction
-  dunn_res <- dunnTest(
+  dunn_res <- FSA::dunnTest(
     as.formula(paste(varname, "~ publisher_type")),
     data = ratios,
     method = "bonferroni"
   )
 
   #extract & format
-  dunn_res_long <- dunn_res$res %>%
-    rename(p.adj = P.adj) %>%
-    separate(Comparison, into = c("group2", "group1"), sep = " - ") %>%
-    mutate(
+  dunn_res_long <- dunn_res$res |>
+    dplyr::rename(p.adj = P.adj) |>
+    tidyr::separate(Comparison, into = c("group2", "group1"), sep = " - ") |>
+    dplyr::mutate(
       y.position = 0.82, # adjust as needed per variable
-      p.signif = case_when(
+      p.signif = dplyr::case_when(
         p.adj < 0.001 ~ "***",
         p.adj < 0.01 ~ "**",
         p.adj < 0.05 ~ "*",
         TRUE ~ "ns"
       )
-    ) %>%
-    filter(p.signif != "ns") # only show significant comparisons
+    ) |>
+    dplyr::filter(p.signif != "ns") # only show significant comparisons
 
   #to draw y-axis only in first plot
   if (i != 1) {
-    remove = T
+    remove <- TRUE
   } else {
-    remove = F
+    remove <- FALSE
   }
   if (i == 1) {
-    add = T
+    add <- TRUE
   } else {
-    add = F
+    add <- FALSE
   }
 
   #to add panel label (a, b, c)
   label_layer <- switch(
     i,
-    annotate(
+    ggplot2::annotate(
       "text",
       x = 0.6,
       y = 1.05,
@@ -79,7 +84,7 @@ plot_list <- lapply(1:length(vars), function(i) {
       size = 4,
       hjust = 0
     ),
-    annotate(
+    ggplot2::annotate(
       "text",
       x = 0.6,
       y = 1.05,
@@ -88,7 +93,7 @@ plot_list <- lapply(1:length(vars), function(i) {
       size = 4,
       hjust = 0
     ),
-    annotate(
+    ggplot2::annotate(
       "text",
       x = 0.6,
       y = 1.05,
@@ -99,8 +104,11 @@ plot_list <- lapply(1:length(vars), function(i) {
     )
   )
 
-  ggplot(ratios, aes_string(x = "publisher_type", y = varname)) +
-    geom_boxplot(fill = "white", width = 0.5, outlier.shape = NA) +
+  ggplot2::ggplot(
+    ratios,
+    ggplot2::aes_string(x = "publisher_type", y = varname)
+  ) +
+    ggplot2::geom_boxplot(fill = "white", width = 0.5, outlier.shape = NA) +
     #ylab(varname) +  # Change label dynamically if desired
     #xlab("Publisher Type") +
     ggdist::stat_halfeye(
@@ -112,20 +120,21 @@ plot_list <- lapply(1:length(vars), function(i) {
       fill = "#745392",
       point_colour = NA
     ) +
-    geom_point(
+    ggplot2::geom_point(
       size = 1,
       alpha = 0.6,
       col = "#745392",
       fill = "#745392",
-      position = position_jitter(seed = 1, width = 0.1)
+      position = ggplot2::position_jitter(seed = 1, width = 0.1)
     ) +
-    geom_hline(
+
+    ggplot2::geom_hline(
       yintercept = 0.5,
       linetype = "dashed",
       color = "darkgray",
       size = 1
     ) +
-    stat_pvalue_manual(
+    ggpubr::stat_pvalue_manual(
       dunn_res_long,
       label = "p.signif",
       tip.length = 0.01,
@@ -133,50 +142,68 @@ plot_list <- lapply(1:length(vars), function(i) {
       y.position = "y.position"
     ) +
     label_layer +
-    scale_y_continuous(limits = c(-0.1, 1.05), breaks = seq(0, 1, by = 0.2)) +
-    #stat_n_text(size=3) + #added: to optionally add sample sizes (need to adapt scale_y_continuous lower limit to (i.e. -0.1))
-    theme_minimal() + #added
-    theme(
-      axis.text.x = element_text(size = 10),
-      axis.title.x = element_blank(),
-      axis.line.x = element_line(linetype = "blank"),
-      axis.title.y = element_blank(),
-      axis.ticks.x = element_blank(),
-      plot.title = element_text(hjust = 0.5) #,
-      #axis.ticks.y = element_blank()
+    ggplot2::scale_y_continuous(
+      limits = c(-0.1, 1.05),
+      breaks = seq(0, 1, by = 0.2)
     ) +
+    #stat_n_text(size=3) + #added: to optionally add sample sizes (need to adapt scale_y_continuous lower limit to (i.e. -0.1))
+    ggplot2::theme_minimal() + #added
+    ggplot2::theme(
+      axis.text.x = ggplot2::element_text(size = 10),
+      axis.title.x = ggplot2::element_blank(),
+      axis.line.x = ggplot2::element_line(linetype = "blank"),
+      axis.title.y = ggplot2::element_blank(),
+      axis.ticks.x = ggplot2::element_blank(),
+      plot.title = ggplot2::element_text(hjust = 0.5) #,
+    ) +
+
     {
       if (remove) {
-        theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())
-      }
-    } +
-    {
-      if (add) {
-        theme(
-          axis.text.y = element_text(size = 10) #,
-          #axis.line.y = element_line(linetype = "solid", colour = "black")
+        ggplot2::theme(
+          axis.text.y = ggplot2::element_blank(),
+          axis.ticks.y = ggplot2::element_blank()
         )
       }
     } +
-    ggtitle('') #paste('Citing', varname, 'journals', sep=' ')
+
+    {
+      if (add) {
+        ggplot2::theme(
+          axis.text.y = ggplot2::element_text(size = 10)
+        )
+      }
+    } +
+    ggplot2::ggtitle('') #paste('Citing', varname, 'journals', sep=' ')
 })
 
-x_label <- textGrob("Publisher type", gp = gpar(fontsize = 14))
-y_label <- textGrob("Citation ratio (%)", gp = gpar(fontsize = 14), rot = 90)
+x_label <- grid::textGrob(
+  "Publisher type",
+  gp = grid::gpar(fontsize = 14)
+)
 
-combined_plot <- arrangeGrob(grobs = plot_list, ncol = 3)
-combined_plot <- grid.arrange(
-  arrangeGrob(
+y_label <- grid::textGrob(
+  "Citation ratio (%)",
+  gp = grid::gpar(fontsize = 14),
+  rot = 90
+)
+
+combined_plot <- gridExtra::arrangeGrob(grobs = plot_list, ncol = 3)
+
+combined_plot <- gridExtra::grid.arrange(
+  gridExtra::arrangeGrob(
     y_label,
     combined_plot,
     ncol = 2,
-    widths = unit.c(unit(1, "lines"), unit(1, "npc") - unit(1, "lines"))
+    widths = grid::unit.c(
+      grid::unit(1, "lines"),
+      grid::unit(1, "npc") - grid::unit(1, "lines")
+    )
   ),
   bottom = x_label
 )
 
 # Save to TIFF
-ggsave(
+ggplot2::ggsave(
   here::here("figures", "SUPP_final_plot_3panel_priorfiltering.tiff"),
   combined_plot,
   width = 10,
