@@ -1,0 +1,4 @@
+"fp_nonacademic","fp_academic","np","business_model","is_academic","n_journals","var"
+0.431581706796141,0.223359208405151,0.345059084798708,"NP",TRUE,82,"mean ratio"
+0.432511897099636,0.284747131859145,0.282740971041218,"FP",TRUE,82,"mean ratio"
+0.445796566621947,0.233971040526943,0.32023239285111,"FP",FALSE,106,"mean ratio"
