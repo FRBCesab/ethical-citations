@@ -54,7 +54,7 @@ list_refsfiles <- list_refsfiles[which(
 res_list <- list()
 
 for (i in 1:length(list_refsfiles)) {
-  df <- qs::qread(list_refsfiles[i])
+  df <- qs::qread(list_refsfiles[])
 
   df <- dplyr::left_join(
     df,
@@ -132,10 +132,8 @@ for (i in 1:length(list_refsfiles)) {
   colnames(res) <- gsub("^na_dafnee_na$", "na_dafnee", colnames(res))
 
   res_list <- append(res_list, list(res))
-
   print(i)
 }
-
 
 ## Export results ----
 
@@ -314,6 +312,55 @@ write.csv(
 )
 
 
+####
+# check number of self citations among publisher types
+###
+res_list_self <- list()
+
+for (i in 1:length(list_refsfiles)) {
+  df <- qs::qread(list_refsfiles[i])
+  
+  df <- dplyr::left_join(
+    df,
+    dafnee,
+    by = c("oa_referenced_work_source_id" = "oa_source_id")
+  )
+  
+  #prop.self<-nrow(df[which(df$"oa_source_id" == df$"oa_referenced_work_source_id"), ])###
+  #count.NA<-sum(is.na(df$"oa_referenced_work_source_id")) ####
+  prop.self<- df %>% group_by(oa_work_id) %>% summarise(n_all=n(),
+                                                       n_self=sum(oa_source_id == oa_referenced_work_source_id, na.rm = TRUE),
+                                                       n_na= sum(is.na(oa_referenced_work_source_id)),
+                                                       prop.self=n_self/n_all) %>%
+    filter(n_all > 5) %>% ungroup() %>%
+    summarise(mean=mean(prop.self, na.rm=T))
+  
+  self<- data.frame(oa_source_id=df$oa_source_id[1], prop.self=prop.self)
+  res_list_self[[length(res_list_self) + 1]] <- self ###
+}
+
+selfs<- do.call("rbind", res_list_self) ###
+selfs<- dplyr::left_join(selfs, dafnee, by='oa_source_id') ###
+
+selfs<- selfs %>% mutate(publisher_type=case_when(business_model=="Non-profit" & is_dafnee %in% c("academic", "nonacademic") ~ "NP",
+                                             business_model=="For-profit" & is_dafnee == "academic" ~ "FP_acad",
+                                             business_model=="For-profit" & is_dafnee == "nonacademic" ~ "FP"))
+p<-ggplot2::ggplot(
+  selfs,
+  ggplot2::aes_string(x="publisher_type", y="mean")) +
+  ggtitle("Number of self citations (journal average, %)") +
+  ggplot2::geom_boxplot(fill = "white", width = 0.5, outlier.shape = NA) +
+  ggdist::stat_halfeye(adjust = 0.5, width = 0.6, .width = 0, justification = -0.3,
+    alpha = 0.3, fill = "#745392", point_colour = NA) +
+  ggplot2::geom_point( size = 1, alpha = 0.6,
+    col = "#745392", fill = "#745392", position = ggplot2::position_jitter(seed = 1, width = 0.1)) +
+  ggplot2::theme_minimal()
+ggsave("figures/diff_number_selfcitations.jpg", p)
+
+kruskal.test(publisher_type ~ mean, data=selfs) #not significant
+library(FSA)
+dunnTest(mean ~ publisher_type, data=selfs, method="bh")
+
 
 #####
 #####
@@ -350,7 +397,7 @@ ratios$publisher_type <- forcats::fct_recode(
 #One panel per type of reference that is cited, publisher type on x axis
 #Containing stats (pairwise t-tests)m testing for sig differences in citation of i.e. NP among publisher types
 vars <- c("FP", "FP_acad", "NP")
-
+vars <- c("mean")
 
 # Create list of plots
 plot_list <- lapply(1:length(vars), function(i) {
@@ -396,7 +443,7 @@ plot_list <- lapply(1:length(vars), function(i) {
     ggplot2::annotate(
       "text",
       x = 0.6,
-      y = 1.05,
+      y = 0.2,
       label = "a) citing FP",
       fontface = "bold",
       size = 4,
@@ -505,7 +552,7 @@ y_label <- grid::textGrob(
   rot = 90
 )
 
-combined_plot <- gridExtra::arrangeGrob(grobs = plot_list, ncol = 3)
+combined_plot <- gridExtra::arrangeGrob(grobs = plot_list, ncol = 1)
 
 combined_plot <- gridExtra::grid.arrange(
   gridExtra::arrangeGrob(
