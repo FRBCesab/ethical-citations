@@ -54,7 +54,7 @@ list_refsfiles <- list_refsfiles[which(
 res_list <- list()
 
 for (i in 1:length(list_refsfiles)) {
-  df <- qs::qread(list_refsfiles[])
+  df <- qs::qread(list_refsfiles[i])
 
   df <- dplyr::left_join(
     df,
